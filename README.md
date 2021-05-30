@@ -7,4 +7,3 @@
 [Тут](https://diploma.nomoredomains.monster)
 
 Публичный IP: 84.201.163.6
-# movies-explorer-frontend
