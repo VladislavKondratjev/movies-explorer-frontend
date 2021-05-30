@@ -1,0 +1,103 @@
+.sign {
+  min-width: 282px;
+  max-width: 60vw;
+  margin: 0 auto;
+  width: 396px;
+  padding: 70px 0;
+  height: 100vh;
+}
+
+.sign__title {
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 29px;
+  margin-bottom: 40px;
+  margin-top: 37px;
+}
+
+.sign__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.sign__input-heading {
+  font-weight: normal;
+  font-size: 10px;
+  line-height: 12px;
+  color: #8b8b8b;
+  margin-bottom: 10px;
+}
+
+.sign__input {
+  background-color: #2f2f2f;
+  border: none;
+  border-radius: 8px;
+  height: 46px;
+  font-weight: normal;
+  font-size: 13px;
+  line-height: 16px;
+  color: white;
+  padding-left: 15px;
+  margin-bottom: 18px;
+}
+
+.sign__input-error {
+  font-weight: normal;
+  font-size: 10px;
+  line-height: 12px;
+  color: #ee3465;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.sign__submit-button {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  width: 396px;
+  background-color: #4285f4;
+  border-radius: 3px;
+  margin-top: 44px;
+  margin-bottom: 20px;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+}
+
+.sign__to-sign {
+  text-align: center;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  color: #8b8b8b;
+}
+
+.sign__link-to-sign {
+  color: #4285f4;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 767px) {
+  .sign {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+  }
+  .sign__submit-button {
+    width: 100%;
+    margin-top: 133px;
+    margin-bottom: 14px;
+  }
+  .sign__form {
+    width: 260px;
+  }
+  .sign__title {
+    margin-bottom: 74px;
+  }
+
+}
