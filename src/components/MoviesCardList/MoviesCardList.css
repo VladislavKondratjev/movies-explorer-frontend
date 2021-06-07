@@ -7,7 +7,6 @@
 .movies-card-list-elements {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
   margin-top: 80px;
   gap: 40px 20px;
 }
@@ -26,6 +25,11 @@
   padding: 0;
   margin-top: 60px;
   cursor: pointer;
+}
+
+.movies__loading {
+  display: flex;
+  justify-content: center;
 }
 
 @media screen and (max-width: 1160px) {

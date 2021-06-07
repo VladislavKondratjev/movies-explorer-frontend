@@ -20,9 +20,21 @@
   cursor: pointer;
   outline: none;
   transition: 0.3s;
-  color: white;
 }
 
 .button:hover {
   opacity: 0.8;
+}
+
+.button_disabled {
+  opacity: .5;
+  cursor: none;
+}
+
+.error {
+  font-weight: normal;
+  font-size: 10px;
+  line-height: 12px;
+  color: #ee3465;
+  margin-bottom: 10px;
 }

@@ -41,15 +41,6 @@
   margin-bottom: 18px;
 }
 
-.sign__input-error {
-  font-weight: normal;
-  font-size: 10px;
-  line-height: 12px;
-  color: #ee3465;
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
 .sign__submit-button {
   font-weight: 500;
   font-size: 14px;

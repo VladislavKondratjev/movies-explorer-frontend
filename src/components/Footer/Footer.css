@@ -54,6 +54,14 @@
   text-decoration: none;
 }
 
+@media screen and (max-width: 1210px) {
+  .footer {
+    max-width: 1010px;
+    margin: 0 auto;
+    padding: 0;
+  }
+}
+
 @media screen and (max-width: 1023px) {
   .footer {
     max-width: 708px;

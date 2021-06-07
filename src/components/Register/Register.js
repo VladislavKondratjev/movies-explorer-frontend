@@ -1,16 +1,43 @@
+import React from 'react';
 import "./Register.css";
+import "../App/App.css"
 import logo from "../../images/header__logo.svg";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useHistory } from "react-router-dom";
+import { useFormWithValidation } from '../../hooks/useForm';
 
-export default function Register() {
+export default function Register({ onRegister }) {
+  const { values, handleChange, errors, setValues } = useFormWithValidation();
+  const history = useHistory();
+
+  React.useEffect(() => {
+    setValues(values);
+  }, [setValues, values])
+
+  // const resetForm = () => {
+  //   setValues(values);
+  // }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!values.password || !values.email || !values.name) {
+      return;
+    }
+
+    onRegister(values)
+      // .then(resetForm)
+      .then(() => history.push('/movies'))
+      .catch(err => console.log(err))
+  }
+
   return (
     <section className="sign">
-      <NavLink exact to="/">
+      <NavLink exact to="/" >
+
         <img className="header__logo" src={logo} alt="Movies Explorer logo" />
       </NavLink>
       <h1 className="sign__title">Добро пожаловать!</h1>
-      <form className="sign__form" method="PATCH" action="#">
-        <span className="sign__input-heading">Имя</span>
+      <form className="sign__form" method="PATCH" action="#" onSubmit={handleSubmit}>
+        <label className="sign__input-heading">Имя</label>
         <input
           id="name"
           name="name"
@@ -18,11 +45,15 @@ export default function Register() {
           type="name"
           className="sign__input"
           placeholder="Имя"
-          minLength="9"
+          minLength="2"
           maxLength="40"
           required
+          onChange={handleChange}
+          value={values.name || ""}
         />
-        <span className="sign__input-heading">E-mail</span>
+        <span className="error">{errors.name || ""}</span>
+
+        <label className="sign__input-heading">E-mail</label>
         <input
           id="email"
           name="email"
@@ -33,8 +64,12 @@ export default function Register() {
           minLength="9"
           maxLength="40"
           required
+          onChange={handleChange}
+          value={values.email || ""}
         />
-        <span className="sign__input-heading">Пароль</span>
+        <span className="error">{errors.email || ""}</span>
+
+        <label className="sign__input-heading">Пароль</label>
         <input
           id="password"
           name="password"
@@ -45,8 +80,10 @@ export default function Register() {
           minLength="8"
           maxLength="15"
           required
+          onChange={handleChange}
+          value={values.password || ""}
         />
-        <span className="sign__input-error">Что-то пошло не так...</span>
+        <span className="error">{errors.password || ""}</span>
 
         <button type="submit" className="sign__submit-button button">
           Зарегистрироваться
