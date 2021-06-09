@@ -1,49 +1,59 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./MoviesCardList.css";
 import MoviesCard from "../MoviesCard/MoviesCard.js";
 import Preloader from "../Preloader/Preloader.js";
-import { MainApi } from "../../utils/MainApi";
 
 export default function MoviesCardList(props) {
-  //   const windowWidth = `{$(window).width()}`;
-  // console.log(windowWidth)
-  const [savedMovies, setSavedMovies] = React.useState(true);
+  const { isMoviesLoading, loadingError, moviesData, saveMovie, delMovie, count, empty, savedMovies } = props;
 
-  function handleSaveMovie(data) {
-    MainApi.saveMovie(data)
-      .then((newCard) => {
-        setSavedMovies([newCard.data, ...savedMovies])
-      })
-      .catch((err) => console.log(err));
+  const [moviesRender, setMoviesRender] = React.useState([])
+
+  useEffect(() => {
+    const firstArray = moviesData.slice(0, count.repeat);
+    setMoviesRender(firstArray);
+  }, [count.repeat, moviesData]);
+
+
+  function handleAddMore() {
+    let currentCount = moviesRender.length + count.add;
+    let mArr = moviesData.slice(0, currentCount);
+    setMoviesRender(mArr);
+  }
+
+  function isSaved(id) {
+    return savedMovies.some((item) => {
+      return item.movieId === id;
+    });
   }
 
   return (
     <section className="movies-card-list">
-      {props.isMoviesLoading && <Preloader />}
-      {props.isMoviesError && <p className="movies__loading">Ничего не найдено.</p>}
+      {isMoviesLoading && <Preloader />}
+      {loadingError && <p className="movies__loading">Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен.
+        Подождите немного и попробуйте ещё раз.</p>}
+      {empty && <p className="movies__loading">Ничего не найдено.</p>}
       <section className="movies-card-list-elements">
-        {props.movies.map((movie) => {
-            return (
-              <MoviesCard
-                key={movie.id}
-                movie={movie}
-                isLiked={props.isLiked}
-                onCardLike={handleSaveMovie}
-                isOwn={props.isOwn}
-                onCardDelete={props.onCardDelete}
-              />
-            );
-          })}
+        {/* {(location.pathName === "saved-movies") && currentSaveMovies.map((item) => (
+          <MoviesCard key={item.movieId} title={item.nameRU} time={item.duration} imgPath={item.image} trailer={item.trailer} del={true} delMovie={delMovie} movieData={item} />
+        )
+        )} */}
+        {moviesRender.map((movie) => {
+          return (
+            <MoviesCard
+              key={movie.id} movieData={movie} title={movie.nameRU} duration={movie.duration} image={movie.image} trailerLink={movie.trailer}
+              del={false} saveMovie={saveMovie} delMovie={delMovie} saved={isSaved(movie.movieId)}
+            />
+          );
+        })}
       </section>
-      {props.filteredMovies.length > 0  &&
-      <button
-        type="button"
-        className="movies-card-list__more-button button"
-        onClick={props.handleAddMoreMovies}
-      >
-        Ещё
-      </button>
-      }
+      {(moviesData.length > moviesRender.length) &&
+        <button
+          type="button"
+          className="movies-card-list__more-button button"
+          onClick={handleAddMore}
+        >
+          Ещё
+      </button>}
     </section>
   );
 }

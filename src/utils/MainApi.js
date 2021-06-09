@@ -44,16 +44,18 @@ class Api {
     });
   };
 
-  getMovies(data) {
-    return fetch(`${this._address}/`), {
+  getSavedMovies() {
+    return fetch(`${this._address}/movies`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.removeItem("jwt")}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       }
-    }
+    })
   }
 
-  saveMovie(data) {
+  saveMovie(movie) {
     return fetch(`${this._address}/movies`, {
       method: "POST",
       headers: {
@@ -61,18 +63,18 @@ class Api {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        country: data.country,
-        director:data.director,
-        duration: data.duration,
-        year: data.year,
-        description: data.description,
-        image: data.image,
-        trailer: data.trailer,
-        nameRU: data.nameRU,
-        nameEN: data.nameEN,
-        thumbnail: data.thumbnail,
-        movieId: data.movieId,
-    })
+        country: movie.country,
+        director: movie.director,
+        duration: movie.duration,
+        year: movie.year,
+        description: movie.description,
+        image: movie.image,
+        trailer: movie.trailer,
+        nameRU: movie.nameRU,
+        nameEN: movie.nameEN,
+        thumbnail: movie.image,
+        movieId: movie.movieId,
+      })
     }).then((res) => this._apiAnswer(res));
   }
 

@@ -8,17 +8,18 @@ import { useFormWithValidation } from '../../hooks/useForm';
 export default function Login({ onLogin }) {
   const history = useHistory();
   const { values, handleChange, errors, setValues } = useFormWithValidation();
+  // const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
     setValues(values);
   }, [setValues, values])
-
+  
   function handleSubmit(e) {
     e.preventDefault();
     if (!values.email || !values.password) {
       return;
     }
-
+    
     onLogin(values)
       .then(() => history.push("/movies"))
       .catch((err) => console.log(err));
@@ -69,7 +70,8 @@ export default function Login({ onLogin }) {
         />
         <span className="error">{errors.password || ""}</span>
 
-        <button type="submit" className="sign__submit-button button">
+        <button type="submit" className={`sign__submit-button button`
+        } >
           Войти
         </button>
         <span className="sign__to-sign">

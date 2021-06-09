@@ -10,11 +10,15 @@ export default function MoviesCard(props) {
   //   `${props.isOwn ? 'movies-card__delete' : `${cardLikeButtonClassName}`}`
   // );
   function handleCardLike() {
-    props.onCardLike();
+    if (props.saved) {
+      props.delMovie(props.movieData.movieId);
+    } else {
+      props.saveMovie(props.movieData);
+    }
   }
 
-  function handleCardDelete() {
-    props.onCardDelete();
+  function handleDelClick() {
+    props.delMovie(props.movieData._id);
   }
 
   function getTimeFromMins(mins) {
@@ -22,24 +26,22 @@ export default function MoviesCard(props) {
     let minutes = mins % 60;
     return hours + "ч " + minutes + "м";
   }
-
-  const duration = getTimeFromMins(props.movie.duration);
-
+  const duration = getTimeFromMins(props.duration);
   return (
     <section className="movies-card">
-      <a href={props.movie.trailerLink} target="__blank">
+      <a href={props.trailerLink} target="__blank">
         <img
           className="movies-card__preview"
-          src={props.movie.image === null ? movie_icon : "https://api.nomoreparties.co"+props.movie.image.url}
-          alt={props.movie.nameRU}
+          src={props.image === null ? movie_icon : 'https://api.nomoreparties.co'+props.image.url}
+          alt={props.nameRU}
         />
       </a>
       <div className="movies-card__info">
-        <h3 className="movies-card__title">{props.movie.nameRU}</h3>
+        <h3 className="movies-card__title">{props.title}</h3>
         {props.isOwn ? (
           <button
             className="movies-card__delete button"
-            onClick={handleCardDelete}
+            onClick={handleDelClick}
           ></button>
         ) : (
           <button

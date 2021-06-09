@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react";
+import React, { useState } from "react";
 import { Route, Switch, useHistory, Redirect } from "react-router-dom";
 import Footer from "../Footer/Footer.js";
 import Header from "../Header/Header.js";
@@ -18,13 +18,18 @@ import { MoviesApi } from "../../utils/MoviesApi";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = React.useState(false);
-  const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [currentUser, setCurrentUser] = React.useState({});
-  const [errorMessage, setErrorMessage] = React.useState({ message: "" });
-  const [movies, setMovies] = React.useState([]);
-  const [isMoviesLoading, setIsMoviesLoading] = React.useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState({});
+  const [errorMessage, setErrorMessage] = useState({ message: "" });
+  const [savedMovies, setSavedMovies] = useState([]);
+  const [isMoviesLoading, setIsMoviesLoading] = useState(false);
+  const [loadingError, setLoadingError] = useState(false);
+  const [resMovies, setResMovies] = useState([]);
+  const [filtredArray, setFiltredArray] = useState([]);
+  const [empty, setEmpty] = useState(false);
+  const [currentSaveMovies, setCurrentSaveMovies] = useState([]);
 
   const history = useHistory();
 
@@ -129,15 +134,158 @@ export default function App() {
     tokenCheck();
   }, [tokenCheck, loggedIn]);
 
-  function handleGetMovies() {
-    setIsMoviesLoading(true);
-    MoviesApi.getMovies()
+
+
+  function handleSearchMovieButton(searchQuery) {
+    setLoadingError(false);
+    setIsMoviesLoading(true)
+    setEmpty(false);
+    const movArr = localStorage.getItem('movies');
+    if (!movArr) {
+      MoviesApi.getMovies()
+        .then((res) => {
+          const movies = res.map(item => {
+            let newItem = { ...item };
+            return newItem;
+          });
+          return movies;
+        })
+        .then((movies) => {
+          localStorage.setItem('movies', JSON.stringify(movies));
+          setTimeout(resMovieHandler, 1000, searchQuery);
+        })
+        .catch((err) => {
+          setTimeout(resMovieHandler, 1000, true);
+        })
+    } else {
+      setTimeout(resMovieHandler, 1000, searchQuery);
+    }
+  }
+
+  function resMovieHandler(word) {
+    if (word === true) {
+      setLoadingError(true);
+      setIsMoviesLoading(false);
+    } else {
+      setLoadingError(false);
+      setIsMoviesLoading(false);
+      const startMovArr = JSON.parse(localStorage.getItem('movies'));
+      let resArray = searching(startMovArr, word);
+      if (resArray.length === 0) {
+        setEmpty(true);
+      }
+      setResMovies(resArray)
+    }
+  }
+
+  function searching(allMovies, searchQuery) {
+    const moviesFiltered = [];
+    allMovies.forEach(function (element) {
+      const dataMovie = [element.nameEN && element.nameEN.toLowerCase(), element.nameRU && element.nameRU.toLowerCase()].join();
+      if (dataMovie.includes(searchQuery)) {
+        moviesFiltered.push(element);
+      }
+    });
+    return moviesFiltered;
+  }
+
+  function handleSearchShortButton(checked) {
+    if (checked) {
+      let shoortFiltredArray = [];
+      if (resMovies.length > 0) {
+        shoortFiltredArray = searchShort(resMovies);
+      }
+      if (shoortFiltredArray.length > 0) {
+        setFiltredArray(resMovies);
+        setResMovies(shoortFiltredArray);
+      }
+    } else {
+      setResMovies(filtredArray);
+    }
+  }
+
+  function searchShort(allMovies) {
+    const moviesFiltered = [];
+    allMovies.forEach(function (element) {
+      if (element.duration) {
+        if (element.duration <= 40) {
+          moviesFiltered.push(element);
+        }
+      }
+    });
+    return moviesFiltered;
+  }
+
+  function handleSearchSavedMovie(word) {
+    const startMovArr = savedMovies;
+    const resArray = searching(startMovArr, word);
+    if (resArray.length === 0) {
+      setEmpty(true);
+    }
+    setCurrentSaveMovies(resArray);
+  }
+
+  function handleSearchShortSavedButton(valCheckBox) {
+    if (valCheckBox) { // для тру
+      let shoortFiltredArray = [];
+      if (currentSaveMovies.length > 0) {
+        shoortFiltredArray = searchShort(currentSaveMovies);
+      }
+      setFiltredArray(currentSaveMovies);
+      setCurrentSaveMovies(shoortFiltredArray);
+    } else {
+      setCurrentSaveMovies(filtredArray);
+    }
+  }
+
+  function handlerSaveMovie(movieData) {
+    MainApi.saveMovie(movieData)
       .then((res) => {
-        setMovies(res);
+        return MainApi.getSavedMovies();
       })
-      .catch((err) => console.log(err))
-      .finally(() => setIsMoviesLoading(false));
-  };
+      .then((res) => {
+        setSavedMovies(res);
+      })
+      .catch((err) => {
+        console.log('Что-то пошло не так');
+      });
+  }
+
+  function handlerToggleSaveMovie(movieData) {
+    let id;
+    savedMovies.forEach(function (item) {
+      if (item.movieId === movieData) {
+        id = item._id;
+      }
+    });
+    MainApi.deleteMovie(id)
+      .then((res) => {
+        return MainApi.getSavedMovies();
+      })
+      .then((res) => {
+        setSavedMovies(res);
+      })
+      .catch(() => {
+        console.log('что то пошло не так');
+      });
+  }
+
+  function handlerDeleteMovie(m) {
+    MainApi.deleteMovie(m)
+      .then((res) => {
+        return MainApi.getSavedMovies();
+      })
+      .then((res) => {
+        setSavedMovies(res);
+      })
+      .catch(() => {
+        console.log('что то пошло не так');
+      });
+  }
+
+  React.useEffect(() => {
+    setCurrentSaveMovies(savedMovies);
+  }, [savedMovies]);
 
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
@@ -155,17 +303,21 @@ export default function App() {
               path="/movies"
               component={Movies}
               loggedIn={loggedIn}
-              movies={movies}
+              onSearch={handleSearchMovieButton}
+              moviesData={resMovies}
+              savedMovies={savedMovies}
               isMoviesLoading={isMoviesLoading}
-              onGetMovies={handleGetMovies}
+              loadingError={loadingError}
+              saveMovie={handlerSaveMovie}
+              delMovie={handlerToggleSaveMovie}
+              empty={empty}
+              filterShort={handleSearchShortButton}
             />
             <ProtectedRoute
               path="/saved-movies"
               component={SavedMovies}
               loggedIn={loggedIn}
-              movies={movies}
               isMoviesLoading={isMoviesLoading}
-              onGetMovies={handleGetMovies}
             />
             <ProtectedRoute
               path="/profile"

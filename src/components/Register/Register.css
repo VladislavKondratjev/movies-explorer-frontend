@@ -59,6 +59,11 @@
   text-align: center;
 }
 
+.sign__submit-button_disabled {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
 .sign__to-sign {
   text-align: center;
   font-weight: normal;
