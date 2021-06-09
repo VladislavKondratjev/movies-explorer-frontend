@@ -1,11 +1,16 @@
 import "./Footer.css";
+import { useLocation } from "react-router-dom";
 
 export default function Footer(props) {
+  const location = useLocation();
 
-  const footerClassName = (
-    `${props.isSign ? 'footer_hidden' : 'footer'}`
-  )
-
+  const footerClassName = `${
+    location.pathname === "/sign-in" ||
+    location.pathname === "/sign-up" ||
+    location.pathname === "*"
+      ? "footer_hidden"
+      : "footer"
+  }`;
   return (
     <footer className={footerClassName}>
       <h3 className="footer__title">

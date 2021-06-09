@@ -4,7 +4,7 @@ import MoviesCard from "../MoviesCard/MoviesCard.js";
 import Preloader from "../Preloader/Preloader.js";
 
 export default function MoviesCardList(props) {
-  const { isMoviesLoading, loadingError, moviesData, saveMovie, delMovie, count, empty, savedMovies } = props;
+  const { isMoviesLoading, loadingError, moviesData, saveMovie, onMovieDelete, count, empty, savedMovies } = props;
 
   const [moviesRender, setMoviesRender] = React.useState([])
 
@@ -22,7 +22,7 @@ export default function MoviesCardList(props) {
 
   function isSaved(id) {
     return savedMovies.some((item) => {
-      return item.movieId === id;
+      return item.id === id;
     });
   }
 
@@ -33,15 +33,11 @@ export default function MoviesCardList(props) {
         Подождите немного и попробуйте ещё раз.</p>}
       {empty && <p className="movies__loading">Ничего не найдено.</p>}
       <section className="movies-card-list-elements">
-        {/* {(location.pathName === "saved-movies") && currentSaveMovies.map((item) => (
-          <MoviesCard key={item.movieId} title={item.nameRU} time={item.duration} imgPath={item.image} trailer={item.trailer} del={true} delMovie={delMovie} movieData={item} />
-        )
-        )} */}
         {moviesRender.map((movie) => {
           return (
             <MoviesCard
               key={movie.id} movieData={movie} title={movie.nameRU} duration={movie.duration} image={movie.image} trailerLink={movie.trailer}
-              del={false} saveMovie={saveMovie} delMovie={delMovie} saved={isSaved(movie.movieId)}
+              saveMovie={saveMovie} onMovieDelete={onMovieDelete} saved={isSaved(movie.id)} isOwn={props.isOwn}
             />
           );
         })}

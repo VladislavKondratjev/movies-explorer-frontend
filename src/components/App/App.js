@@ -9,7 +9,6 @@ import Movies from "../Movies/Movies.js";
 import NotFound from "../NotFound/NotFound.js";
 import Profile from "../Profile/Profile.js";
 import Register from "../Register/Register.js";
-import SavedMovies from "../SavedMovies/SavedMovies.js";
 import CurrentUserContext from "../../contexts/CurrentUserContext.js";
 import * as auth from "../../utils/auth";
 import { MainApi } from "../../utils/MainApi";
@@ -30,7 +29,7 @@ export default function App() {
   const [filtredArray, setFiltredArray] = useState([]);
   const [empty, setEmpty] = useState(false);
   const [currentSaveMovies, setCurrentSaveMovies] = useState([]);
-
+  const [nothingSaved, setNothingSaved] = useState(false)
   const history = useHistory();
 
   function handleErrorMessage(message) {
@@ -56,14 +55,30 @@ export default function App() {
   }
 
   React.useEffect(() => {
+    setCurrentSaveMovies(savedMovies);
+  }, [savedMovies]);
+
+  React.useEffect(() => {
     if (loggedIn) {
       MainApi.getUserData()
         .then((res) => {
           setCurrentUser(res);
         })
         .catch((err) => console.log(err));
+      MainApi.getSavedMovies()
+        .then((res) => {
+          currentSaveMovies.length === 0
+            ? setNothingSaved(true)
+            :
+            setSavedMovies(res)
+          setCurrentSaveMovies(res)
+          setNothingSaved(false)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }, [loggedIn]);
+  }, [loggedIn, currentSaveMovies.length]);
 
   function handleUpdateUser(data) {
     MainApi.updateUserInfo(data)
@@ -247,7 +262,7 @@ export default function App() {
         setSavedMovies(res);
       })
       .catch((err) => {
-        console.log('Что-то пошло не так');
+        console.log(`При сохранении фильма что-то пошло не так. ${err}`);
       });
   }
 
@@ -255,7 +270,7 @@ export default function App() {
     let id;
     savedMovies.forEach(function (item) {
       if (item.movieId === movieData) {
-        id = item._id;
+        id = item.id;
       }
     });
     MainApi.deleteMovie(id)
@@ -265,13 +280,13 @@ export default function App() {
       .then((res) => {
         setSavedMovies(res);
       })
-      .catch(() => {
-        console.log('что то пошло не так');
+      .catch((err) => {
+        console.log(`При удалении фильма что-то пошло не так. ${err}`);
       });
   }
 
-  function handlerDeleteMovie(m) {
-    MainApi.deleteMovie(m)
+  function handlerDeleteMovie(_id) {
+    MainApi.deleteMovie(_id)
       .then((res) => {
         return MainApi.getSavedMovies();
       })
@@ -282,10 +297,6 @@ export default function App() {
         console.log('что то пошло не так');
       });
   }
-
-  React.useEffect(() => {
-    setCurrentSaveMovies(savedMovies);
-  }, [savedMovies]);
 
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
@@ -303,21 +314,30 @@ export default function App() {
               path="/movies"
               component={Movies}
               loggedIn={loggedIn}
+              switchTo="movies"
+              empty={empty}
               onSearch={handleSearchMovieButton}
               moviesData={resMovies}
               savedMovies={savedMovies}
               isMoviesLoading={isMoviesLoading}
               loadingError={loadingError}
               saveMovie={handlerSaveMovie}
-              delMovie={handlerToggleSaveMovie}
-              empty={empty}
+              onMovieDelete={handlerToggleSaveMovie}
+              nothingSaved={nothingSaved}
               filterShort={handleSearchShortButton}
             />
             <ProtectedRoute
               path="/saved-movies"
-              component={SavedMovies}
+              component={Movies}
               loggedIn={loggedIn}
               isMoviesLoading={isMoviesLoading}
+              switchTo="saved-movies"
+              nothingSaved={nothingSaved}
+              onSearch={handleSearchSavedMovie}
+              savedMovies={savedMovies}
+              onMovieDelete={handlerDeleteMovie}
+              filterShort={handleSearchShortSavedButton}
+              currentSaveMovies={currentSaveMovies}
             />
             <ProtectedRoute
               path="/profile"

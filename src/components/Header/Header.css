@@ -9,7 +9,7 @@
 }
 
 .header_hidden {
-  visibility: hidden;
+  display: none;
 }
 
 .header__navigation {
