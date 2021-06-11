@@ -21,10 +21,7 @@ class Api {
   updateUserInfo(data) {
     return fetch(`${this._address}/users/me`, {
       method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({
         name: data.name,
         email: data.email,
@@ -53,7 +50,7 @@ class Api {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({
-        country: movie.country,
+        country: movie.nameRU,
         director: movie.director,
         duration: movie.duration,
         year: movie.year,
@@ -61,7 +58,7 @@ class Api {
         image: 'https://api.nomoreparties.co'+movie.image.url,
         trailer: movie.trailerLink,
         nameRU: movie.nameRU,
-        nameEN: movie.nameEN,
+        nameEN: movie.nameRU,
         thumbnail: 'https://api.nomoreparties.co'+movie.image.url,
         movieId: movie.id,
       })
@@ -75,8 +72,8 @@ class Api {
     }).then((res) => this._apiAnswer(res));
   }
 
-  changeMovieStatus(id, _id, state) {
-    return state ? this.saveMovie(id) : this.deleteMovie(_id);
+  changeMovieStatus(movie, _id, state) {
+    return state ? this.deleteMovie(_id) :  this.saveMovie(movie);
   }
 }
 

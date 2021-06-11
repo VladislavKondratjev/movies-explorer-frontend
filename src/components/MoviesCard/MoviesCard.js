@@ -3,20 +3,17 @@ import "./MoviesCard.css";
 import movie_icon from "../../images/866dc9b6d6daa856c2b2375feea1cc3c.png";
 
 export default function MoviesCard(props) {
-  
   function handleMovieLike() {
-    if (props.saved) {
-      console.log(props.movieData)
-      props.onMovieDelete(props.movieData._id);
+    if (cardLikeButtonClassName === 'movies-card__like_active') {
+      props.onDeleteMovie(props.movieData._id);
     } else {
-      props.saveMovie(props.movieData);
+      props.onSaveMovie(props.movieData);
     }
   }
-  const cardLikeButtonClassName = `${props.saved ? "movies-card__like_active" : "movies-card__like_disabled"
-    }`;
-  
+  const cardLikeButtonClassName = `${props.isSaved ? "movies-card__like_active" : "movies-card__like_disabled"}`;
+
   function handleMovieDelete() {
-    props.onMovieDelete(props.movieData._id);
+    props.onDeleteMovie(props.movieData._id);
   }
 
   function getTimeFromMins(mins) {
@@ -34,7 +31,6 @@ export default function MoviesCard(props) {
         <img
           className="movies-card__preview"
           src={url}
-          // src={props.image === 'https://api.nomoreparties.co' ? movie_icon : props.image}
           alt={props.nameRU}
         />
       </a>

@@ -10,7 +10,7 @@ import NotFound from "../NotFound/NotFound.js";
 import Profile from "../Profile/Profile.js";
 import Register from "../Register/Register.js";
 import CurrentUserContext from "../../contexts/CurrentUserContext.js";
-import * as auth from "../../utils/auth";
+import auth from "../../utils/auth";
 import { MainApi } from "../../utils/MainApi";
 import { MoviesApi } from "../../utils/MoviesApi";
 
@@ -21,24 +21,20 @@ export default function App() {
   const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
-  const [errorMessage, setErrorMessage] = useState({ message: "" });
+  const [statusMessage, setStatusMessage] = useState("");
   const [savedMovies, setSavedMovies] = useState([]);
   const [isMoviesLoading, setIsMoviesLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [resMovies, setResMovies] = useState([]);
-  const [filtredArray, setFiltredArray] = useState([]);
+  const [searchResult, setSearchResult] = useState([]);
+  const [filteredArray, setFilteredArray] = useState([]);
   const [empty, setEmpty] = useState(false);
-  const [currentSaveMovies, setCurrentSaveMovies] = useState([]);
+  const [currentSavedMovies, setCurrentSavedMovies] = useState([]);
   const [nothingSaved, setNothingSaved] = useState(false)
   const history = useHistory();
 
-  function handleErrorMessage(message) {
-    setErrorMessage({ message: message });
-  }
-
   function handleLogout() {
     setLoggedIn(false);
-    localStorage.clear();
+    localStorage.clear("jwt", "movies");
     history.push("/");
   }
 
@@ -55,7 +51,7 @@ export default function App() {
   }
 
   React.useEffect(() => {
-    setCurrentSaveMovies(savedMovies);
+    setCurrentSavedMovies(savedMovies);
   }, [savedMovies]);
 
   React.useEffect(() => {
@@ -67,29 +63,39 @@ export default function App() {
         .catch((err) => console.log(err));
       MainApi.getSavedMovies()
         .then((res) => {
-          currentSaveMovies.length === 0
+          currentSavedMovies.length !== 0 && savedMovies.length !== 0
             ? setNothingSaved(true)
-            :
-            setSavedMovies(res)
-          setCurrentSaveMovies(res)
-          setNothingSaved(false)
+            : setSavedMovies(res) && setCurrentSavedMovies(res)
         })
         .catch((err) => {
           console.log(err);
         });
     }
-  }, [loggedIn, currentSaveMovies.length]);
+  }, [loggedIn, currentSavedMovies.length, savedMovies.length]);
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  function handleEditProfile() {
+    setIsEdit(true)
+    setDisabled(false)
+  }
 
   function handleUpdateUser(data) {
     MainApi.updateUserInfo(data)
       .then((res) => {
-        if (res.statusCode === 409)
-          throw new Error("Пользователь с таким email уже существует.");
         setCurrentUser(res);
       })
+      .then(setTimeout(() => {
+        setStatusMessage('Данные успешно сохранены!')
+      }, 5000))
       .catch((err) => {
-        handleErrorMessage(`При обновлении профиля произошла ошибка: ${err}`);
-      });
+        setStatusMessage(`При обновлении профиля произошла ошибка. ${err}`);
+      })
+      .finally(() => {
+        setIsEdit(false);
+        setDisabled(true);
+      })
   }
 
   const handleRegister = ({ name, email, password }) => {
@@ -126,14 +132,18 @@ export default function App() {
     }
   }, [history]);
 
+  const [loginStatus, setLoginStatus] = useState(false)
+  const [loginMessage, setLoginMessage] = useState('')
+
   const handleLogin = ({ email, password }) => {
-    return auth
-      .login(email, password)
+    return auth.login(email, password)
       .then((res) => {
         if (!res || res.statusCode === 400)
-          throw new Error("Не передано одно из полей ");
+          setLoginStatus(true)
+        setLoginMessage("Не передано одно из полей ");
         if (!res || res.statusCode === 401)
-          throw new Error("Пользователь с таким email не найден");
+          setLoginStatus(true)
+        setLoginMessage("Пользователь с таким email не найден");
         if (res.token) {
           localStorage.setItem("jwt", res.token);
           setLoggedIn(true);
@@ -149,14 +159,28 @@ export default function App() {
     tokenCheck();
   }, [tokenCheck, loggedIn]);
 
-
+  function handleSearchResults(searchQuery) {
+    if (searchQuery === true) {
+      setLoadingError(true);
+      setIsMoviesLoading(false);
+    } else {
+      setLoadingError(false);
+      setIsMoviesLoading(false);
+      const cashedMovies = JSON.parse(localStorage.getItem('movies'));
+      let resArray = toSearch(cashedMovies, searchQuery);
+      if (resArray.length === 0) {
+        setEmpty(true);
+      }
+      setSearchResult(resArray)
+    }
+  }
 
   function handleSearchMovieButton(searchQuery) {
     setLoadingError(false);
     setIsMoviesLoading(true)
     setEmpty(false);
-    const movArr = localStorage.getItem('movies');
-    if (!movArr) {
+    const moviesArr = localStorage.getItem('movies');
+    if (!moviesArr) {
       MoviesApi.getMovies()
         .then((res) => {
           const movies = res.map(item => {
@@ -167,35 +191,19 @@ export default function App() {
         })
         .then((movies) => {
           localStorage.setItem('movies', JSON.stringify(movies));
-          setTimeout(resMovieHandler, 1000, searchQuery);
+          setTimeout(handleSearchResults, 1000, searchQuery);
         })
-        .catch((err) => {
-          setTimeout(resMovieHandler, 1000, true);
+        .catch(() => {
+          setTimeout(handleSearchResults, 1000, true);
         })
     } else {
-      setTimeout(resMovieHandler, 1000, searchQuery);
+      setTimeout(handleSearchResults, 1000, searchQuery);
     }
   }
 
-  function resMovieHandler(word) {
-    if (word === true) {
-      setLoadingError(true);
-      setIsMoviesLoading(false);
-    } else {
-      setLoadingError(false);
-      setIsMoviesLoading(false);
-      const startMovArr = JSON.parse(localStorage.getItem('movies'));
-      let resArray = searching(startMovArr, word);
-      if (resArray.length === 0) {
-        setEmpty(true);
-      }
-      setResMovies(resArray)
-    }
-  }
-
-  function searching(allMovies, searchQuery) {
+  function toSearch(allMoviesArray, searchQuery) {
     const moviesFiltered = [];
-    allMovies.forEach(function (element) {
+    allMoviesArray.forEach(function (element) {
       const dataMovie = [element.nameEN && element.nameEN.toLowerCase(), element.nameRU && element.nameRU.toLowerCase()].join();
       if (dataMovie.includes(searchQuery)) {
         moviesFiltered.push(element);
@@ -206,16 +214,16 @@ export default function App() {
 
   function handleSearchShortButton(checked) {
     if (checked) {
-      let shoortFiltredArray = [];
-      if (resMovies.length > 0) {
-        shoortFiltredArray = searchShort(resMovies);
+      let shortFilteredArray = [];
+      if (searchResult.length > 0) {
+        shortFilteredArray = searchShort(searchResult);
       }
-      if (shoortFiltredArray.length > 0) {
-        setFiltredArray(resMovies);
-        setResMovies(shoortFiltredArray);
+      if (shortFilteredArray.length > 0) {
+        setFilteredArray(searchResult);
+        setSearchResult(shortFilteredArray);
       }
     } else {
-      setResMovies(filtredArray);
+      setSearchResult(filteredArray);
     }
   }
 
@@ -231,70 +239,73 @@ export default function App() {
     return moviesFiltered;
   }
 
-  function handleSearchSavedMovie(word) {
-    const startMovArr = savedMovies;
-    const resArray = searching(startMovArr, word);
-    if (resArray.length === 0) {
-      setEmpty(true);
+  function handleSearchSavedMovie(query) {
+    const resultsArray = toSearch(savedMovies, query);
+    setCurrentSavedMovies(resultsArray);
+    if (resultsArray.length === 0) {
+      return setEmpty(true);
     }
-    setCurrentSaveMovies(resArray);
   }
 
-  function handleSearchShortSavedButton(valCheckBox) {
-    if (valCheckBox) { // для тру
-      let shoortFiltredArray = [];
-      if (currentSaveMovies.length > 0) {
-        shoortFiltredArray = searchShort(currentSaveMovies);
+  function handleSearchShortSavedButton(checked) {
+    if (checked) {
+      let shortFilteredArray = [];
+      if (currentSavedMovies.length > 0) {
+        shortFilteredArray = searchShort(currentSavedMovies);
       }
-      setFiltredArray(currentSaveMovies);
-      setCurrentSaveMovies(shoortFiltredArray);
+      setFilteredArray(currentSavedMovies);
+      setCurrentSavedMovies(shortFilteredArray);
+      if (currentSavedMovies.length === 0) {
+        return setEmpty(true);
+      }
     } else {
-      setCurrentSaveMovies(filtredArray);
+      setCurrentSavedMovies(filteredArray);
     }
   }
 
-  function handlerSaveMovie(movieData) {
-    MainApi.saveMovie(movieData)
-      .then((res) => {
+  function handleSaveMovie(movie) {
+    MainApi.saveMovie(movie)
+      .then(() => {
         return MainApi.getSavedMovies();
       })
       .then((res) => {
         setSavedMovies(res);
       })
       .catch((err) => {
-        console.log(`При сохранении фильма что-то пошло не так. ${err}`);
+        console.log(`Что-то пошло не так. ${err}`);
       });
   }
 
-  function handlerToggleSaveMovie(movieData) {
+  function handleDeleteMovie(movie) {
+    // const savedFilm = savedMovies.find(item => item.movieId === movie.movieId)
     let id;
-    savedMovies.forEach(function (item) {
-      if (item.movieId === movieData) {
-        id = item.id;
+    savedMovies.forEach((item) => {
+      if (item.movieId === movie) {
+        id = item._id;
       }
     });
     MainApi.deleteMovie(id)
-      .then((res) => {
+      .then(() => {
         return MainApi.getSavedMovies();
       })
       .then((res) => {
         setSavedMovies(res);
       })
       .catch((err) => {
-        console.log(`При удалении фильма что-то пошло не так. ${err}`);
+        console.log(`Что-то пошло не так. ${err}`);
       });
   }
 
-  function handlerDeleteMovie(_id) {
+  function handleDeleteMovieFromSaved(_id) {
     MainApi.deleteMovie(_id)
-      .then((res) => {
+      .then(() => {
         return MainApi.getSavedMovies();
       })
       .then((res) => {
         setSavedMovies(res);
       })
-      .catch(() => {
-        console.log('что то пошло не так');
+      .catch((err) => {
+        console.log(`Что-то пошло не так. ${err}`);
       });
   }
 
@@ -317,14 +328,15 @@ export default function App() {
               switchTo="movies"
               empty={empty}
               onSearch={handleSearchMovieButton}
-              moviesData={resMovies}
+              moviesData={searchResult}
               savedMovies={savedMovies}
               isMoviesLoading={isMoviesLoading}
               loadingError={loadingError}
-              saveMovie={handlerSaveMovie}
-              onMovieDelete={handlerToggleSaveMovie}
+              onSaveMovie={handleSaveMovie}
+              onDeleteMovie={handleDeleteMovie}
               nothingSaved={nothingSaved}
               filterShort={handleSearchShortButton}
+              searchResult={searchResult}
             />
             <ProtectedRoute
               path="/saved-movies"
@@ -333,19 +345,23 @@ export default function App() {
               isMoviesLoading={isMoviesLoading}
               switchTo="saved-movies"
               nothingSaved={nothingSaved}
+              empty={empty}
               onSearch={handleSearchSavedMovie}
               savedMovies={savedMovies}
-              onMovieDelete={handlerDeleteMovie}
+              onDeleteMovie={handleDeleteMovieFromSaved}
               filterShort={handleSearchShortSavedButton}
-              currentSaveMovies={currentSaveMovies}
+              currentSavedMovies={currentSavedMovies}
             />
             <ProtectedRoute
               path="/profile"
               component={Profile}
               loggedIn={loggedIn}
               onUpdateUser={handleUpdateUser}
+              handleEditProfile={handleEditProfile}
               onLogout={handleLogout}
-              error={errorMessage}
+              message={statusMessage}
+              isEdit={isEdit}
+              disabled={disabled}
             />
             <Route exact path="/">
               <Main />
@@ -354,7 +370,10 @@ export default function App() {
               <Register onRegister={handleRegister} />
             </Route>
             <Route path="/sign-in">
-              <Login onLogin={handleLogin} />
+              <Login
+                onLogin={handleLogin}
+                loginStatus={loginStatus}
+                loginMessage={loginMessage} />
             </Route>
             <Route path="*" component={NotFound} />
             <Route>

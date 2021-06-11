@@ -1,23 +1,22 @@
 import React from "react";
 
-export function useForm() {
-  const [values, setValues] = React.useState({});
+// export function useForm() {
+//   const [values, setValues] = React.useState({});
 
-  const handleChange = (evt) => {
-    const input = evt.target;
-    const value = input.value;
-    const name = input.name;
-    setValues({ ...values, [name]: value });
-  };
+//   const handleChange = (evt) => {
+//     const input = evt.target;
+//     const value = input.value;
+//     const name = input.name;
+//     setValues({ ...values, [name]: value });
+//   };
 
-  return { values, handleChange, setValues };
-}
+//   return { values, handleChange, setValues };
+// }
 
 export function useFormWithValidation() {
   const [values, setValues] = React.useState({});
   const [errors, setErrors] = React.useState({});
   const [isValid, setIsValid] = React.useState(false);
-  // const [isDisabled, setIsDisabled] = React.useState(false);
 
   const handleChange = (evt) => {
     const input = evt.target;
@@ -33,10 +32,9 @@ export function useFormWithValidation() {
       setValues(newValues);
       setErrors(newErrors);
       setIsValid(newIsValid);
-      // setIsDisabled(newIsDisabled)
     },
-    [setValues, setErrors, setIsValid]
+    [setValues, setErrors, setIsValid ]
   );
 
-  return { values, handleChange, errors, isValid, setValues, resetFrom };
+  return { values, handleChange, errors, isValid, setValues, resetFrom,  };
 }

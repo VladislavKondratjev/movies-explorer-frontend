@@ -2,14 +2,15 @@ import React from "react";
 import MoviesCard from "../MoviesCard/MoviesCard.js";
 
 export default function SavedMovies(props) {
-  const { onMovieDelete, currentSaveMovies, nothingSaved, isOwn } = props;
+  const { onDeleteMovie, currentSavedMovies, nothingSaved, isOwn, empty } = props;
 
   return (
     <section className="movies">
       {!nothingSaved && <p className="movies__loading">Ничего не сохранено.</p>}
+      {empty && <p className="movies__loading">Ничего не найдено.</p>}
       <section className="movies-card-list">
         <section className="movies-card-list-elements">
-          {currentSaveMovies.map((movie) => (
+          {currentSavedMovies.map((movie) => (
             <MoviesCard
               movieData={movie}
               key={movie._id}
@@ -18,7 +19,7 @@ export default function SavedMovies(props) {
               image={movie.image}
               trailerLink={movie.trailer}
               isOwn={isOwn}
-              onMovieDelete={onMovieDelete} />)
+              onDeleteMovie={onDeleteMovie} />)
           )}
         </section>
       </section>

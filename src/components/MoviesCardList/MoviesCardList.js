@@ -4,25 +4,23 @@ import MoviesCard from "../MoviesCard/MoviesCard.js";
 import Preloader from "../Preloader/Preloader.js";
 
 export default function MoviesCardList(props) {
-  const { isMoviesLoading, loadingError, moviesData, saveMovie, onMovieDelete, count, empty, savedMovies } = props;
-
-  const [moviesRender, setMoviesRender] = React.useState([])
+  const { isMoviesLoading, loadingError, onSaveMovie, onDeleteMovie, count, empty, savedMovies, searchResult } = props;
+  const [moviesRendered, setMoviesRendered] = React.useState([])
 
   useEffect(() => {
-    const firstArray = moviesData.slice(0, count.repeat);
-    setMoviesRender(firstArray);
-  }, [count.repeat, moviesData]);
-
+    const displayedMovies = searchResult.slice(0, count.repeat);
+    setMoviesRendered(displayedMovies);
+  }, [count.repeat, searchResult]);
 
   function handleAddMore() {
-    let currentCount = moviesRender.length + count.add;
-    let mArr = moviesData.slice(0, currentCount);
-    setMoviesRender(mArr);
+    let currentCount = moviesRendered.length + count.add;
+    let displayedMovies = searchResult.slice(0, currentCount);
+    setMoviesRendered(displayedMovies);
   }
 
   function isSaved(id) {
-    return savedMovies.some((item) => {
-      return item.id === id;
+    return props.savedMovies.some((item) => {
+      return item.movieId === id;
     });
   }
 
@@ -33,23 +31,32 @@ export default function MoviesCardList(props) {
         Подождите немного и попробуйте ещё раз.</p>}
       {empty && <p className="movies__loading">Ничего не найдено.</p>}
       <section className="movies-card-list-elements">
-        {moviesRender.map((movie) => {
+        {moviesRendered.map((movie) => {
           return (
             <MoviesCard
-              key={movie.id} movieData={movie} title={movie.nameRU} duration={movie.duration} image={movie.image} trailerLink={movie.trailer}
-              saveMovie={saveMovie} onMovieDelete={onMovieDelete} saved={isSaved(movie.id)} isOwn={props.isOwn}
+              key={movie.id}
+              movieData={movie}
+              title={movie.nameRU}
+              duration={movie.duration}
+              image={movie.image}
+              trailerLink={movie.trailerLink}
+              onSaveMovie={onSaveMovie}
+              onDeleteMovie={onDeleteMovie}
+              isOwn={props.isOwn}
+              isSaved={isSaved(movie.id)}
+              savedMovies={savedMovies}
+              searchResult={searchResult}
             />
           );
         })}
       </section>
-      {(moviesData.length > moviesRender.length) &&
+      {(searchResult.length > moviesRendered.length) &&
         <button
           type="button"
           className="movies-card-list__more-button button"
           onClick={handleAddMore}
-        >
-          Ещё
-      </button>}
+        >Ещё</button>
+        }
     </section>
   );
 }

@@ -27,8 +27,17 @@
 }
 
 .button_disabled {
+  border-style: none;
+  /* background-color: transparent; */
+  text-decoration: none;
+  padding: 0;
   opacity: .5;
-  cursor: none;
+  cursor: default;
+}
+
+.button_disabled:hover {
+  opacity: 0;
+  cursor: default;
 }
 
 .error {

@@ -6,25 +6,27 @@ import { NavLink, Link, useHistory } from "react-router-dom";
 import { useFormWithValidation } from '../../hooks/useForm';
 
 export default function Register({ onRegister }) {
-  const { values, handleChange, errors, setValues } = useFormWithValidation();
+  const { values, handleChange, errors, setValues, isValid } = useFormWithValidation();
   const history = useHistory();
+  const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
     setValues(values);
   }, [setValues, values])
 
-  // const resetForm = () => {
-  //   setValues(values);
-  // }
+  React.useEffect(() => {
+    const disabled = !isValid
+    setDisabled(disabled);
+  }, [isValid]);
+
+  const submitButtonClassName = `${disabled ? "sign__submit-button_disabled" : "sign__submit-button button"}`
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!values.password || !values.email || !values.name) {
       return;
     }
-
     onRegister(values)
-      // .then(resetForm)
       .then(() => history.push('/movies'))
       .catch(err => console.log(err))
   }
@@ -85,7 +87,7 @@ export default function Register({ onRegister }) {
         />
         <span className="error">{errors.password || ""}</span>
 
-        <button type="submit" className="sign__submit-button button">
+        <button type="submit" className={submitButtonClassName}>
           Зарегистрироваться
         </button>
         <span className="sign__to-sign">

@@ -5,25 +5,32 @@ import { NavLink, Link, useHistory } from "react-router-dom";
 import { useFormWithValidation } from '../../hooks/useForm';
 
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, loginStatus, loginMessage }) {
   const history = useHistory();
-  const { values, handleChange, errors, setValues } = useFormWithValidation();
-  // const [disabled, setDisabled] = React.useState(true);
+  const { values, handleChange, errors, setValues, isValid } = useFormWithValidation();
+  const [disabled, setDisabled] = React.useState(true);
 
   React.useEffect(() => {
     setValues(values);
   }, [setValues, values])
-  
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!values.email || !values.password) {
       return;
     }
-    
+
     onLogin(values)
-      .then(() => history.push("/movies"))
+      .then(() => history.push("/"))
       .catch((err) => console.log(err));
   };
+
+  React.useEffect(() => {
+    const disabled = !isValid
+    setDisabled(disabled);
+  }, [isValid]);
+
+  const submitButtonClassName = `${disabled ? "sign__submit-button_disabled" : "sign__submit-button button"}`
 
   return (
     <section className="sign">
@@ -69,11 +76,9 @@ export default function Login({ onLogin }) {
           value={values.password || ""}
         />
         <span className="error">{errors.password || ""}</span>
+        {loginStatus && <span className="error">{loginMessage}</span>}
 
-        <button type="submit" className={`sign__submit-button button`
-        } >
-          Войти
-        </button>
+        <button type="submit" className={submitButtonClassName} disabled={disabled}>Войти</button>
         <span className="sign__to-sign">
           Ещё не зарегистрированы?{" "}
           <Link to="/sign-up" className="sign__link-to-sign button">

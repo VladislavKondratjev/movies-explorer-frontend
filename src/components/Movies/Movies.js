@@ -6,7 +6,7 @@ import SavedMovies from "../SavedMovies/SavedMovies";
 import { useLocation } from "react-router-dom";
 
 export default function Movies(props) {
-  const { switchTo, isMoviesLoading, loadingError, moviesData, saveMovie, onMovieDelete, empty, savedMovies, currentSaveMovies, nothingSaved } = props;
+  const { switchTo, isMoviesLoading, loadingError, onSaveMovie, onDeleteMovie, empty, savedMovies, currentSavedMovies, nothingSaved, isSaved, searchResult } = props;
   const [countCard, setCountCard] = React.useState({ repeat: 0, add: 0 });
   const location = useLocation();
   const isOwn = `${location.pathname === "/saved-movies" ? true : false}`;
@@ -54,20 +54,21 @@ export default function Movies(props) {
       {switchTo === "movies"
         ?
         <MoviesCardList
-          moviesData={moviesData}
           count={countCard}
           isMoviesLoading={isMoviesLoading}
           loadingError={loadingError}
           empty={empty}
-          saveMovie={saveMovie}
-          onMovieDelete={onMovieDelete}
+          onSaveMovie={onSaveMovie}
+          onDeleteMovie={onDeleteMovie}
           savedMovies={savedMovies}
+          isSaved={isSaved}
+          searchResult={searchResult}
         />
         :
         <SavedMovies
           savedMovies={savedMovies}
-          onMovieDelete={onMovieDelete}
-          currentSaveMovies={currentSaveMovies}
+          onDeleteMovie={onDeleteMovie}
+          currentSavedMovies={currentSavedMovies}
           isOwn={isOwn}
           nothingSaved={nothingSaved}
         />

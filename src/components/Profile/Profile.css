@@ -80,6 +80,17 @@
   color: white;
 }
 
+.profile__save-edit_disabled {
+  height: 45px;
+  width: 396px;
+  border-radius: 3px;
+  margin-top: 199px;
+  color: white;
+  opacity: 0.2;
+  pointer-events: none;
+  background-color: grey;
+}
+
 @media screen and (max-width: 767px) {
   .profile {
     margin-top: 50px;
@@ -92,9 +103,14 @@
   .profile__input-block {
     width: 100%;
   }
-  
+
   .profile__save-edit {
-  width: 100%;
-  margin-top: 358px;
+    width: 100%;
+    margin-top: 199px;
+  }
+
+  .profile__save-edit_disabled {
+    width: 100%;
+    margin-top: 199px;
   }
 }

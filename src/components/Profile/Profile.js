@@ -1,20 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Profile.css";
 import "../App/App.css";
 import CurrentUserContext from "../../contexts/CurrentUserContext.js";
 import { useFormWithValidation } from "../../hooks/useForm";
-import ErrorSpan from "../ErrorSpan/ErrorSpan.js";
 
 export default function Profile(props) {
   const currentUser = React.useContext(CurrentUserContext);
-  const [isEdit, setIsEdit] = React.useState(false);
+  const { values, handleChange, errors, setValues, isValid } = useFormWithValidation();
+  const [status, setStatus] = useState(false);
   const [disabled, setDisabled] = React.useState(true);
-  const { values, handleChange, errors, setValues } = useFormWithValidation();
-
-  function handleEditProfile() {
-    setIsEdit(true);
-    setDisabled(false);
-  }
 
   React.useEffect(() => {
     if (currentUser) {
@@ -28,13 +22,28 @@ export default function Profile(props) {
   function handleSubmit(e) {
     e.preventDefault();
     props.onUpdateUser(values);
-    setIsEdit(false);
-    setDisabled(true);
+  }
+
+  React.useEffect(() => {
+    setStatus(true);
+    setTimeout(hideStatus, 2000);
+  }, [props.message]);
+
+  function hideStatus() {
+    setStatus(false);
   }
 
   function handleLogout() {
     props.onLogout();
   }
+
+  React.useEffect(() => {
+    const disabled = !isValid
+    setDisabled(disabled);
+  }, [isValid]);
+
+  const submitButtonClassName = `${disabled ? "profile__save-edit_disabled" : "profile__save-edit button"}`
+
 
   return (
     <section className="profile">
@@ -56,7 +65,7 @@ export default function Profile(props) {
             required
             onChange={handleChange}
             value={values.name || ""}
-            disabled={disabled}
+            disabled={props.disabled}
           />
         </div>
         <span className="error">{errors.name || ""}</span>
@@ -74,42 +83,41 @@ export default function Profile(props) {
             required
             onChange={handleChange}
             value={values.email || ""}
-            disabled={disabled}
+            disabled={props.disabled}
           />
         </div>
         <span className="error">{errors.email || ""}</span>
+        {props.isEdit ? (
+          <>
+            {status && <span className="error">{props.message}</span>}
+            <button
+              type="submit"
+              name="submit"
+              className={submitButtonClassName}
+              onSubmit={handleSubmit}
+            >
+              Сохранить
+          </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="profile__edit-button button"
+              onClick={props.handleEditProfile}
+            >
+              Редактировать
+          </button>
+            <button
+              type="button"
+              className="profile__logout-button button"
+              onClick={handleLogout}
+            >
+              Выйти из аккаунта
+          </button>
+          </>
+        )}
       </form>
-
-      {isEdit ? (
-        <>
-          <ErrorSpan message={props.message} />
-          <button
-            type="submit"
-            className={`profile__save-edit button`}
-            onClick={handleSubmit}
-            // disabled={!isValid}
-          >
-            Сохранить
-          </button>
-        </>
-      ) : (
-        <>
-          <button
-            type="button"
-            className="profile__edit-button button"
-            onClick={handleEditProfile}
-          >
-            Редактировать
-          </button>
-          <button
-            type="button"
-            className="profile__logout-button button"
-            onClick={handleLogout}
-          >
-            Выйти из аккаунта
-          </button>
-        </>
-      )}
     </section>
   );
 }
