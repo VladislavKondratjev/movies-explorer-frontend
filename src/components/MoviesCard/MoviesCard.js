@@ -5,7 +5,7 @@ import movie_icon from "../../images/866dc9b6d6daa856c2b2375feea1cc3c.png";
 export default function MoviesCard(props) {
   function handleMovieLike() {
     if (cardLikeButtonClassName === 'movies-card__like_active') {
-      props.onDeleteMovie(props.movieData._id);
+      props.onDeleteMovie(props.movieData.id);
     } else {
       props.onSaveMovie(props.movieData);
     }

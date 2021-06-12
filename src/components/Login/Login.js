@@ -1,12 +1,11 @@
 import React from "react";
 import "../Register/Register.css";
 import logo from "../../images/header__logo.svg";
-import { NavLink, Link, useHistory } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useFormWithValidation } from '../../hooks/useForm';
 
 
 export default function Login({ onLogin, loginStatus, loginMessage }) {
-  const history = useHistory();
   const { values, handleChange, errors, setValues, isValid } = useFormWithValidation();
   const [disabled, setDisabled] = React.useState(true);
 
@@ -19,10 +18,7 @@ export default function Login({ onLogin, loginStatus, loginMessage }) {
     if (!values.email || !values.password) {
       return;
     }
-
     onLogin(values)
-      .then(() => history.push("/"))
-      .catch((err) => console.log(err));
   };
 
   React.useEffect(() => {

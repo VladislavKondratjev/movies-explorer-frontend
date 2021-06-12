@@ -1,7 +1,7 @@
 class Api {
   constructor({ address, headers }) {
     this._address = address;
-    this._headers = headers;
+    this.headers = headers;
   }
 
   _apiAnswer(res) {
@@ -14,14 +14,14 @@ class Api {
   getUserData() {
     return fetch(`${this._address}/users/me`, {
       method: "GET",
-      headers: this._headers,
+      headers: this.headers,
     }).then((res) => this._apiAnswer(res));
   }
 
   updateUserInfo(data) {
     return fetch(`${this._address}/users/me`, {
       method: "PATCH",
-      headers: this._headers,
+      headers: this.headers,
       body: JSON.stringify({
         name: data.name,
         email: data.email,
@@ -41,14 +41,14 @@ class Api {
   getSavedMovies() {
     return fetch(`${this._address}/movies`, {
       method: "GET",
-      headers: this._headers,
+      headers: this.headers,
     }).then((res) => this._apiAnswer(res));
   }
 
   saveMovie(movie) {
     return fetch(`${this._address}/movies`, {
       method: "POST",
-      headers: this._headers,
+      headers: this.headers,
       body: JSON.stringify({
         country: movie.nameRU,
         director: movie.director,
@@ -68,7 +68,7 @@ class Api {
   deleteMovie(_id) {
     return fetch(`${this._address}/movies/${_id}`, {
       method: "DELETE",
-      headers: this._headers,
+      headers: this.headers,
     }).then((res) => this._apiAnswer(res));
   }
 

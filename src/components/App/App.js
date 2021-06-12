@@ -10,7 +10,7 @@ import NotFound from "../NotFound/NotFound.js";
 import Profile from "../Profile/Profile.js";
 import Register from "../Register/Register.js";
 import CurrentUserContext from "../../contexts/CurrentUserContext.js";
-import auth from "../../utils/auth";
+import * as auth from "../../utils/auth";
 import { MainApi } from "../../utils/MainApi";
 import { MoviesApi } from "../../utils/MoviesApi";
 
@@ -29,7 +29,11 @@ export default function App() {
   const [filteredArray, setFilteredArray] = useState([]);
   const [empty, setEmpty] = useState(false);
   const [currentSavedMovies, setCurrentSavedMovies] = useState([]);
-  const [nothingSaved, setNothingSaved] = useState(false)
+  const [nothingSaved, setNothingSaved] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [loginMessage, setLoginMessage] = useState('');
+  const [isEdit, setIsEdit] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   const history = useHistory();
 
   function handleLogout() {
@@ -49,32 +53,6 @@ export default function App() {
     setIsBurgerMenuOpened(false);
     setIsOpen(false);
   }
-
-  React.useEffect(() => {
-    setCurrentSavedMovies(savedMovies);
-  }, [savedMovies]);
-
-  React.useEffect(() => {
-    if (loggedIn) {
-      MainApi.getUserData()
-        .then((res) => {
-          setCurrentUser(res);
-        })
-        .catch((err) => console.log(err));
-      MainApi.getSavedMovies()
-        .then((res) => {
-          currentSavedMovies.length !== 0 && savedMovies.length !== 0
-            ? setNothingSaved(true)
-            : setSavedMovies(res) && setCurrentSavedMovies(res)
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [loggedIn, currentSavedMovies.length, savedMovies.length]);
-
-  const [isEdit, setIsEdit] = useState(false);
-  const [disabled, setDisabled] = useState(true);
 
   function handleEditProfile() {
     setIsEdit(true)
@@ -132,15 +110,12 @@ export default function App() {
     }
   }, [history]);
 
-  const [loginStatus, setLoginStatus] = useState(false)
-  const [loginMessage, setLoginMessage] = useState('')
-
   const handleLogin = ({ email, password }) => {
     return auth.login(email, password)
       .then((res) => {
         if (!res || res.statusCode === 400)
           setLoginStatus(true)
-        setLoginMessage("Не передано одно из полей ");
+        setLoginMessage("Не передано одно из полей");
         if (!res || res.statusCode === 401)
           setLoginStatus(true)
         setLoginMessage("Пользователь с таким email не найден");
@@ -157,7 +132,7 @@ export default function App() {
 
   React.useEffect(() => {
     tokenCheck();
-  }, [tokenCheck, loggedIn]);
+  }, [tokenCheck]);
 
   function handleSearchResults(searchQuery) {
     if (searchQuery === true) {
@@ -308,6 +283,29 @@ export default function App() {
         console.log(`Что-то пошло не так. ${err}`);
       });
   }
+
+  React.useEffect(() => {
+    setCurrentSavedMovies(savedMovies);
+  }, [savedMovies]);
+
+  React.useEffect(() => {
+    if (loggedIn) {
+      MainApi.getUserData()
+        .then((res) => {
+          setCurrentUser(res);
+        })
+        .catch((err) => console.log(err));
+      MainApi.getSavedMovies()
+        .then((res) => {
+          currentSavedMovies.length !== 0 && savedMovies.length !== 0
+            ? setNothingSaved(true)
+            : setSavedMovies(res) && setCurrentSavedMovies(res)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [loggedIn, currentSavedMovies.length, savedMovies.length]);
 
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
