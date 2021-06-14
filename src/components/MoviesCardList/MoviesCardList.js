@@ -7,24 +7,23 @@ export default function MoviesCardList(props) {
   const { isMoviesLoading, loadingError, onSaveMovie, onDeleteMovie, count, empty, savedMovies, searchResult } = props;
 
   const [moviesRendered, setMoviesRendered] = React.useState([])
-
-  const cashedArray = localStorage.getItem('filtered movies');
+  const displayedCashedArray = localStorage.getItem('filtered movies');
 
   useEffect(() => {
-    if (cashedArray) {
-      const displayedCashedArray = JSON.parse(cashedArray).slice(0, count.repeat);
-      return setMoviesRendered(displayedCashedArray)
+    if (displayedCashedArray === null) {
+      return setMoviesRendered()
+    } else if (displayedCashedArray.length > 0) {
+      return setMoviesRendered(JSON.parse(displayedCashedArray))
     }
+  }, [displayedCashedArray]);
+
+  useEffect(() => {
     const displayedMovies = searchResult.slice(0, count.repeat);
     setMoviesRendered(displayedMovies);
-  }, [cashedArray, count.repeat, searchResult]);
+  }, [count.repeat, searchResult]);
 
   function handleAddMore() {
     let currentCount = moviesRendered.length + count.add;
-    if (cashedArray) {
-      let displayedCashedArray = JSON.parse(cashedArray).slice(0, currentCount);
-      return setMoviesRendered(displayedCashedArray)
-    }
     let displayedMovies = searchResult.slice(0, currentCount);
     setMoviesRendered(displayedMovies);
   }

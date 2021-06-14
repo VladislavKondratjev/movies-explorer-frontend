@@ -25,7 +25,6 @@ export default function App() {
   const [savedMovies, setSavedMovies] = useState([]);
   const [isMoviesLoading, setIsMoviesLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
   const [filteredArray, setFilteredArray] = useState([]);
   const [empty, setEmpty] = useState(false);
   const [currentSavedMovies, setCurrentSavedMovies] = useState([]);
@@ -34,7 +33,10 @@ export default function App() {
   const [loginMessage, setLoginMessage] = useState('');
   const [isEdit, setIsEdit] = useState(false);
   const [disabled, setDisabled] = useState(true);
+  const [searchResult, setSearchResult] = useState([]);
   const history = useHistory();
+  const displayedCashedArray = localStorage.getItem('filtered movies');
+  const allMoviesArray = localStorage.getItem('movies');
 
   React.useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -47,25 +49,18 @@ export default function App() {
           if (!res || res.statusCode === 401)
             throw new Error("Переданный токен некорректен");
           if (res) {
-            const resArray = localStorage.getItem('filtered movies');
-            if (resArray) {
-              setFilteredArray(resArray)
-              // setSearchResult(resAr  ray)
-            }
             setLoggedIn(true);
             history.push("/");
           }
         })
-        // .catch(() => history.push("/sign-in"));
-        .catch(() => {
-          localStorage.removeItem('jwt');
-        })
+        .catch((err) => console.log(err));
+      // .catch(() => history.push("/sign-in"));
     }
   }, [history]);
 
   function handleLogout() {
     setLoggedIn(false);
-    localStorage.clear("jwt", "movies");
+    localStorage.clear();
     history.push("/");
   }
 
@@ -107,8 +102,8 @@ export default function App() {
     return auth
       .register(name, email, password)
       .then((res) => {
-        if (!res || res.statusCode === 400) { 
-          throw new Error("Некорректно заполнено одно из полей "); 
+        if (!res || res.statusCode === 400) {
+          throw new Error("Некорректно заполнено одно из полей ");
         }
         setLoggedIn(true);
         history.push("/movies");
@@ -156,8 +151,19 @@ export default function App() {
       setSearchResult(resArray)
     }
   }
+  
+  function toSearch(allMoviesArray, searchQuery) {
+    const moviesFiltered = [];
+    allMoviesArray.forEach(function (element) {
+      const dataMovie = [element.nameEN && element.nameEN.toLowerCase(), element.nameRU && element.nameRU.toLowerCase()].join();
+      if (dataMovie.includes(searchQuery)) {
+        moviesFiltered.push(element);
+      }
+    });
+    localStorage.setItem('filtered movies', JSON.stringify(moviesFiltered));
+    return moviesFiltered;
+  }
 
-  const allMoviesArray = localStorage.getItem('movies');
   function handleSearchMovieButton(searchQuery) {
     setLoadingError(false);
     setIsMoviesLoading(true)
@@ -182,18 +188,6 @@ export default function App() {
     } else {
       setTimeout(handleSearchResults, 1000, searchQuery);
     }
-  }
-
-  function toSearch(allMoviesArray, searchQuery) {
-    const moviesFiltered = [];
-    allMoviesArray.forEach(function (element) {
-      const dataMovie = [element.nameEN && element.nameEN.toLowerCase(), element.nameRU && element.nameRU.toLowerCase()].join();
-      if (dataMovie.includes(searchQuery)) {
-        moviesFiltered.push(element);
-      }
-    });
-    localStorage.setItem('filtered movies', JSON.stringify(moviesFiltered));
-    return moviesFiltered;
   }
 
   function handleSearchShortButton(checked) {
@@ -316,6 +310,14 @@ export default function App() {
     }
   }, [loggedIn, currentSavedMovies.length, savedMovies.length]);
 
+  React.useEffect(() => {
+    if (displayedCashedArray === null) {
+      return
+    } else if (displayedCashedArray.length > 0) {
+      return setSearchResult(JSON.parse(displayedCashedArray))
+    }
+  }, [displayedCashedArray])
+  
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
       <div className="page">
@@ -382,10 +384,10 @@ export default function App() {
                 loginStatus={loginStatus}
                 loginMessage={loginMessage} />
             </Route>
-            <Route path="*" component={NotFound} />
             <Route>
               {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
             </Route>
+            <Route path="*" component={NotFound} />
           </Switch>
           <Footer />
         </div>

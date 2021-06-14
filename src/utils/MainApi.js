@@ -1,5 +1,5 @@
 class Api {
-  constructor({ address, headers }) {
+  constructor({ address }) {
     this._address = address;
   }
 
@@ -21,7 +21,11 @@ class Api {
   updateUserInfo(data) {
     return fetch(`${this._address}/users/me`, {
       method: "PATCH",
-      headers: this.headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         name: data.name,
         email: data.email,
