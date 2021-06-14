@@ -5,15 +5,26 @@ import Preloader from "../Preloader/Preloader.js";
 
 export default function MoviesCardList(props) {
   const { isMoviesLoading, loadingError, onSaveMovie, onDeleteMovie, count, empty, savedMovies, searchResult } = props;
+
   const [moviesRendered, setMoviesRendered] = React.useState([])
 
+  const cashedArray = localStorage.getItem('filtered movies');
+
   useEffect(() => {
+    if (cashedArray) {
+      const displayedCashedArray = JSON.parse(cashedArray).slice(0, count.repeat);
+      return setMoviesRendered(displayedCashedArray)
+    }
     const displayedMovies = searchResult.slice(0, count.repeat);
     setMoviesRendered(displayedMovies);
-  }, [count.repeat, searchResult]);
+  }, [cashedArray, count.repeat, searchResult]);
 
   function handleAddMore() {
     let currentCount = moviesRendered.length + count.add;
+    if (cashedArray) {
+      let displayedCashedArray = JSON.parse(cashedArray).slice(0, currentCount);
+      return setMoviesRendered(displayedCashedArray)
+    }
     let displayedMovies = searchResult.slice(0, currentCount);
     setMoviesRendered(displayedMovies);
   }
@@ -56,7 +67,7 @@ export default function MoviesCardList(props) {
           className="movies-card-list__more-button button"
           onClick={handleAddMore}
         >Ещё</button>
-        }
+      }
     </section>
   );
 }

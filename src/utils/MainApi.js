@@ -1,20 +1,20 @@
 class Api {
   constructor({ address, headers }) {
     this._address = address;
-    this.headers = headers;
   }
 
   _apiAnswer(res) {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
+    return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
   }
 
   getUserData() {
     return fetch(`${this._address}/users/me`, {
       method: "GET",
-      headers: this.headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     }).then((res) => this._apiAnswer(res));
   }
 
@@ -41,25 +41,33 @@ class Api {
   getSavedMovies() {
     return fetch(`${this._address}/movies`, {
       method: "GET",
-      headers: this.headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     }).then((res) => this._apiAnswer(res));
   }
 
   saveMovie(movie) {
     return fetch(`${this._address}/movies`, {
       method: "POST",
-      headers: this.headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         country: movie.nameRU,
         director: movie.director,
         duration: movie.duration,
         year: movie.year,
         description: movie.description,
-        image: 'https://api.nomoreparties.co'+movie.image.url,
+        image: 'https://api.nomoreparties.co' + movie.image.url,
         trailer: movie.trailerLink,
         nameRU: movie.nameRU,
         nameEN: movie.nameRU,
-        thumbnail: 'https://api.nomoreparties.co'+movie.image.url,
+        thumbnail: 'https://api.nomoreparties.co' + movie.image.url,
         movieId: movie.id,
       })
     }).then((res) => this._apiAnswer(res));
@@ -68,20 +76,15 @@ class Api {
   deleteMovie(_id) {
     return fetch(`${this._address}/movies/${_id}`, {
       method: "DELETE",
-      headers: this.headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     }).then((res) => this._apiAnswer(res));
-  }
-
-  changeMovieStatus(movie, _id, state) {
-    return state ? this.deleteMovie(_id) :  this.saveMovie(movie);
   }
 }
 
 export const MainApi = new Api({
   address: "https://api.diploma.nomoredomains.monster",
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  }
 });

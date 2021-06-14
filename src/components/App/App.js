@@ -36,6 +36,33 @@ export default function App() {
   const [disabled, setDisabled] = useState(true);
   const history = useHistory();
 
+  React.useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (!res || res.statusCode === 400)
+            throw new Error("Токен не передан или передан не в том формате");
+          if (!res || res.statusCode === 401)
+            throw new Error("Переданный токен некорректен");
+          if (res) {
+            const resArray = localStorage.getItem('filtered movies');
+            if (resArray) {
+              setFilteredArray(resArray)
+              // setSearchResult(resAr  ray)
+            }
+            setLoggedIn(true);
+            history.push("/");
+          }
+        })
+        // .catch(() => history.push("/sign-in"));
+        .catch(() => {
+          localStorage.removeItem('jwt');
+        })
+    }
+  }, [history]);
+
   function handleLogout() {
     setLoggedIn(false);
     localStorage.clear("jwt", "movies");
@@ -80,8 +107,9 @@ export default function App() {
     return auth
       .register(name, email, password)
       .then((res) => {
-        if (!res || res.statusCode === 400)
-          throw new Error("Некорректно заполнено одно из полей ");
+        if (!res || res.statusCode === 400) { 
+          throw new Error("Некорректно заполнено одно из полей "); 
+        }
         setLoggedIn(true);
         history.push("/movies");
         return res.data;
@@ -91,36 +119,19 @@ export default function App() {
       });
   };
 
-  const tokenCheck = React.useCallback(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      auth
-        .checkToken(jwt)
-        .then((res) => {
-          if (!res || res.statusCode === 400)
-            throw new Error("Токен не передан или передан не в том формате");
-          if (!res || res.statusCode === 401)
-            throw new Error("Переданный токен некорректен ");
-          if (res) {
-            setLoggedIn(true);
-            history.push("/");
-          }
-        })
-        .catch(() => history.push("/sign-in"));
-    }
-  }, [history]);
-
   const handleLogin = ({ email, password }) => {
     return auth.login(email, password)
       .then((res) => {
-        if (!res || res.statusCode === 400)
+        if (!res || res.statusCode === 400) {
           setLoginStatus(true)
-        setLoginMessage("Не передано одно из полей");
-        if (!res || res.statusCode === 401)
+          setLoginMessage("Не передано одно из полей");
+        }
+        if (!res || res.statusCode === 401) {
           setLoginStatus(true)
-        setLoginMessage("Пользователь с таким email не найден");
-        if (res.token) {
-          localStorage.setItem("jwt", res.token);
+          setLoginMessage("Пользователь с таким email не найден");
+        }
+        if (res) {
+          localStorage.setItem('jwt', res);
           setLoggedIn(true);
           history.push("/");
         }
@@ -129,10 +140,6 @@ export default function App() {
         console.log(err);
       });
   };
-
-  React.useEffect(() => {
-    tokenCheck();
-  }, [tokenCheck]);
 
   function handleSearchResults(searchQuery) {
     if (searchQuery === true) {
@@ -150,12 +157,13 @@ export default function App() {
     }
   }
 
+  const allMoviesArray = localStorage.getItem('movies');
   function handleSearchMovieButton(searchQuery) {
     setLoadingError(false);
     setIsMoviesLoading(true)
     setEmpty(false);
-    const moviesArr = localStorage.getItem('movies');
-    if (!moviesArr) {
+    setTimeout(handleSearchResults, 1000, searchQuery);
+    if (!allMoviesArray) {
       MoviesApi.getMovies()
         .then((res) => {
           const movies = res.map(item => {
@@ -184,6 +192,7 @@ export default function App() {
         moviesFiltered.push(element);
       }
     });
+    localStorage.setItem('filtered movies', JSON.stringify(moviesFiltered));
     return moviesFiltered;
   }
 

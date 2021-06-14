@@ -34,7 +34,6 @@ export default function Register({ onRegister }) {
   return (
     <section className="sign">
       <NavLink exact to="/" >
-
         <img className="header__logo" src={logo} alt="Movies Explorer logo" />
       </NavLink>
       <h1 className="sign__title">Добро пожаловать!</h1>
@@ -54,7 +53,6 @@ export default function Register({ onRegister }) {
           value={values.name || ""}
         />
         <span className="error">{errors.name || ""}</span>
-
         <label className="sign__input-heading">E-mail</label>
         <input
           id="email"
@@ -70,7 +68,6 @@ export default function Register({ onRegister }) {
           value={values.email || ""}
         />
         <span className="error">{errors.email || ""}</span>
-
         <label className="sign__input-heading">Пароль</label>
         <input
           id="password"
@@ -86,7 +83,6 @@ export default function Register({ onRegister }) {
           value={values.password || ""}
         />
         <span className="error">{errors.password || ""}</span>
-
         <button type="submit" className={submitButtonClassName}>
           Зарегистрироваться
         </button>
