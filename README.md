@@ -2,3 +2,4 @@
 
 ## Ссылка на лендинг
 [Тут](https://diploma.nomoredomains.monster)
+
