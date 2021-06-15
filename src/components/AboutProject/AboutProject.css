@@ -41,6 +41,7 @@
 .about-project__timeline {
   display: flex;
   margin-top: 92px;
+  justify-content: center;
 }
 
 .about-project__backend {
@@ -85,6 +86,12 @@
   font-size: 14px;
   line-height: 17px;
   color: #8b8b8b;
+}
+
+@media screen and (max-width: 1210px) {
+  .about-project {
+    max-width: 1010px;
+  }
 }
 
 @media screen and (max-width: 1023px) {

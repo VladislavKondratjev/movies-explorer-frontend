@@ -4,7 +4,7 @@
   margin: 0 auto;
   width: 396px;
   padding: 70px 0;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .sign__title {
@@ -41,15 +41,6 @@
   margin-bottom: 18px;
 }
 
-.sign__input-error {
-  font-weight: normal;
-  font-size: 10px;
-  line-height: 12px;
-  color: #ee3465;
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
 .sign__submit-button {
   font-weight: 500;
   font-size: 14px;
@@ -66,6 +57,34 @@
   color: white;
   text-decoration: none;
   text-align: center;
+}
+
+.sign__submit-button_disabled {
+  border-style: none;
+  text-decoration: none;
+  padding: 0;
+  opacity: .5;
+  cursor: default;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 45px;
+  width: 396px;
+  background-color: #4285f4;
+  border-radius: 3px;
+  margin-top: 44px;
+  margin-bottom: 20px;
+  color: white;
+  text-align: center;
+}
+
+.sign__submit-button_disabled {
+  opacity: 0.2;
+  pointer-events: none;
+  background-color: grey;
 }
 
 .sign__to-sign {
@@ -93,6 +112,13 @@
     margin-top: 133px;
     margin-bottom: 14px;
   }
+
+  .sign__submit-button_disabled {
+    width: 100%;
+    margin-top: 133px;
+    margin-bottom: 14px;
+  }
+
   .sign__form {
     width: 260px;
   }

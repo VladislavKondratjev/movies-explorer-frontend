@@ -4,6 +4,8 @@
 
 .movies-card__preview {
   width: 100%;
+  height: 151px;
+  object-fit: cover;
 }
 
 .movies-card__info {
@@ -20,6 +22,10 @@
   font-size: 13px;
   line-height: 16px;
   margin-top: 9px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 240px;
 }
 
 .movies-card__like_active {

@@ -63,6 +63,12 @@
   letter-spacing: -0.04em;
 }
 
+@media screen and (max-width: 1210px) {
+  .techs__content {
+    max-width: 1010px;
+  }
+}
+
 @media screen and (max-width: 1023px) {
   .techs{
     padding-top: 50px;

@@ -53,6 +53,12 @@
   color: black;
 }
 
+
+@media screen and (max-width: 1210px) {
+  .header {
+    max-width: 1010px;
+  }
+}
 @media screen and (max-width: 1023px) {
   .header {
     max-width: 714px;

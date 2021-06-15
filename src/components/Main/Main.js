@@ -6,15 +6,15 @@ import Techs from "../Techs/Techs.js";
 import AboutMe from "../AboutMe/AboutMe.js";
 import Portfolio from "../Portfolio/Portfolio.js";
 
-export default function Main(props) {
+export default function Main() {
   return (
-    <>
+    <main>
       <Promo />
       <NavTab />
       <AboutProject />
       <Techs />
       <AboutMe />
       <Portfolio />
-    </>
+    </main>
   );
 }
