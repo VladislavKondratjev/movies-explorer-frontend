@@ -1,4 +1,6 @@
 {
+  "author": "Vladislav Kondratjev (https://github.com/VladislavKondratjev)",
+  "description": "Фронтенд дипломной работы Movies Explorer.",
   "name": "movies-explorer",
   "version": "0.1.0",
   "private": true,
@@ -17,7 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && scp -r ./build/* diplomavm@84.252.136.189:/home/diplomavm/diploma/movies-explorer-frontend" 
+    "deploy": "npm run build && scp -r ./build/* diplomavm@84.252.136.189:/home/diplomavm/diploma/movies-explorer-frontend"
   },
   "eslintConfig": {
     "extends": [

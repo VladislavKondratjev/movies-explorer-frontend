@@ -5,20 +5,16 @@ import FilterCheckbox from "../FilterCheckbox/FilterCheckbox.js";
 
 export default function SearchForm(props) {
   const [searchQuery, setSearchQuery] = React.useState('');
-  // const [inputErr, setInputErr] = useState('');
 
   function handleChange(e) {
     setSearchQuery(e.target.value);
-    // setInputErr('');
   }
 
   function handleSearchSubmit(e) {
     e.preventDefault();
-    // props.handleSearchQuery(searchQuery);
     if (searchQuery !== '') {
       return props.onSearch(searchQuery);
     }
-    // setInputErr('Нужно ввести ключевое слово');
   }
 
   return (

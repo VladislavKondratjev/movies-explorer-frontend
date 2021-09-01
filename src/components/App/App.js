@@ -54,7 +54,6 @@ export default function App() {
           }
         })
         .catch((err) => console.log(err));
-      // .catch(() => history.push("/sign-in"));
     }
   }, [history]);
 
@@ -255,7 +254,6 @@ export default function App() {
   }
 
   function handleDeleteMovie(movie) {
-    // const savedFilm = savedMovies.find(item => item.movieId === movie.movieId)
     let id;
     savedMovies.forEach((item) => {
       if (item.movieId === movie) {
