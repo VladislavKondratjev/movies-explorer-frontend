@@ -18,10 +18,10 @@ export default function Portfolio() {
           <a className="portfolio__link" href="https://vladislavkondratjev.github.io/russian-travel/">↗</a>
         </li>
         <li className="portfolio__links-element">
-          <a className="portfolio__link" href="https://vkondratjev.nomoredomains.icu/">
+          <a className="portfolio__link" href="https://github.com/VladislavKondratjev/react-mesto-auth">
             Одностраничное приложение
           </a>
-          <a className="portfolio__link" href="https://vkondratjev.nomoredomains.icu/">↗</a>
+          <a className="portfolio__link" href="https://github.com/VladislavKondratjev/react-mesto-auth">↗</a>
         </li>
       </ul>
     </section>
